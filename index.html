@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Downloader</h1>
+        <form id="downloadForm" method="POST" action="/download">
+            <input type="text" id="video_url" name="video_url" placeholder="Paste video URL here..." required>
+            <select name="quality" id="quality">
+                <option value="1080">1080p</option>
+                <option value="720" selected>720p</option>
+                <option value="480">480p</option>
+                <option value="360">360p</option>
+            </select>
+            <button type="submit">Download</button>
+        </form>
+        
+        
+        <p id="error-message" style="color: red;"></p>
+    </div>
+
+    <script>
+        document.getElementById("downloadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let videoUrl = document.getElementById("video_url").value;
+            let quality = document.getElementById("quality").value;
+
+            if (!videoUrl.trim()) {
+                document.getElementById("error-message").innerText = "⚠️ Please enter a video URL!";
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("video_url", videoUrl);
+            formData.append("quality", quality);
+
+            fetch("/download", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Download failed");
+                return response.blob();
+            })
+            .then(blob => {
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "video.mp4";
+                link.click();
+            })
+            .catch(error => {
+                document.getElementById("error-message").innerText = "❌ Error downloading video!";
+            });
+        });
+    </script>
+</body>
+</html>
