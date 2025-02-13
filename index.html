@@ -48,6 +48,15 @@
             margin-bottom: 20px;
         }
 
+        /* Styling the select dropdown */
+        .form-select {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
         /* Styling the button */
         button {
             padding: 12px 25px;
@@ -96,7 +105,7 @@
                 font-size: 24px;
             }
 
-            .form-control {
+            .form-control, .form-select {
                 font-size: 14px;
             }
 
@@ -115,14 +124,26 @@
     <div class="container">
         <h2>Instant Video Downloader</h2>
         <form action="/download" method="POST">
+            <!-- Video URL Input -->
             <input type="text" name="video_url" class="form-control" placeholder="Enter Video URL" required>
+            
+            <!-- Video Quality Selection -->
+            <select name="quality" class="form-select" required>
+                <option value="1080p">1080p (Full HD)</option>
+                <option value="720p" selected>720p (HD)</option>
+                <option value="480p">480p (SD)</option>
+                <option value="360p">360p (High)</option>
+                <option value="audio">Audio Only</option>
+            </select>
+
+            <!-- Submit Button -->
             <button type="submit">Download Video</button>
         </form>
     </div>
 
     <!-- Footer Section -->
     <div class="footer">
-        <p>Made with ❤️ by [Your Name]</p>
+        <p>Made with ❤️ by [Arjun]</p>
         <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </div>
 

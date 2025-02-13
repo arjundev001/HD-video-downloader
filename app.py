@@ -16,24 +16,41 @@ def index():
 @app.route('/download', methods=['POST'])
 def download_video():
     video_url = request.form.get('video_url')
+    quality = request.form.get('quality')
+
     if not video_url:
         return "Error: No URL provided", 400
+
+    # Adjust format selection to avoid merging
+    quality_formats = {
+        "1080p": "bv*[height<=1080][ext=mp4]/b[ext=mp4]/best",
+        "720p": "bv*[height<=720][ext=mp4]/b[ext=mp4]/best",
+        "480p": "bv*[height<=480][ext=mp4]/b[ext=mp4]/best",
+        "360p": "bv*[height<=360][ext=mp4]/b[ext=mp4]/best",
+        "audio": "bestaudio[ext=m4a]"
+    }
+
+    selected_format = quality_formats.get(quality, "best")
 
     try:
         # Download settings for yt-dlp
         ydl_opts = {
             'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
-            'format': 'best'
+            'format': selected_format
         }
 
-        # Download the video using yt-dlp
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=True)
             file_path = ydl.prepare_filename(info)
 
-        # Return the video file to the user
-        return send_file(file_path, as_attachment=True)
-    
+        # Send file to user
+        response = send_file(file_path, as_attachment=True)
+
+        # Delete file after sending
+        os.remove(file_path)
+
+        return response
+
     except Exception as e:
         return f"Error: {str(e)}", 500
 
